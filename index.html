@@ -1,103 +1,535 @@
+
 <!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kalkulator nadgodzin</title>
+
 <style>
-  * { box-sizing: border-box; }
-  body { margin: 0; padding: 16px 12px; background: #eef2f6; color: #172334; font: 16px/1.45 system-ui, sans-serif; }
-  main { max-width: 440px; margin: auto; padding: 24px; background: #fff; border-radius: 14px; }
-  h1 { margin: 0 0 20px; font-size: 24px; }
-  .godziny { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  label { display: block; font-weight: 600; min-width: 0; }
-  input { display: block; width: 100%; min-width: 0; margin-top: 6px; padding: 12px 10px; border: 1px solid #aab6c5; border-radius: 7px; background: #fff; color: inherit; font: inherit; font-size: 20px; }
-  input:focus-visible { outline: 2px solid #2059a3; outline-offset: 2px; }
-  .nastepna { margin-top: 16px; }
-  #wynik { margin-top: 22px; padding-top: 18px; border-top: 1px solid #dce2e8; }
-  .etykieta { color: #526071; font-size: 14px; }
-  .liczba { display: block; font-size: 36px; font-weight: 750; color: #17643b; line-height: 1.2; margin: 3px 0 14px; }
-  .wiersz { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 7px 0; }
-  .wiersz b { text-align: right; font-variant-numeric: tabular-nums; }
-  .alarm { background: #fff1f1; border-left: 3px solid #bb252c; border-radius: 5px; padding: 11px 12px; margin-top: 14px; color: #a51d26; font-size: 14px; }
-  .alarm p { margin: 0; }
-  .alarm p + p { margin-top: 5px; }
-  .czerwony { color: #a51d26; }
-  @media (max-width: 360px) { main { padding: 17px; } }
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 16px 12px;
+    background: #eef2f6;
+    color: #172334;
+    font: 16px/1.45 system-ui, sans-serif;
+  }
+
+  main {
+    max-width: 440px;
+    margin: auto;
+    padding: 24px;
+    background: #fff;
+    border-radius: 14px;
+  }
+
+  h1 {
+    margin: 0 0 20px;
+    font-size: 24px;
+  }
+
+  .godziny {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  label {
+    display: block;
+    font-weight: 600;
+    min-width: 0;
+  }
+
+  input {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    margin-top: 6px;
+    padding: 12px 10px;
+    border: 1px solid #aab6c5;
+    border-radius: 8px;
+    background: #fff;
+    color: inherit;
+    font: inherit;
+    font-size: 26px;
+    font-weight: 600;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  input:focus-visible {
+    outline: 2px solid #2059a3;
+    outline-offset: 2px;
+  }
+
+  .nastepna {
+    margin-top: 16px;
+  }
+
+  .opcjonalne {
+    color: #8993a0;
+    font-size: 12px;
+    font-weight: 400;
+  }
+
+  .tryby {
+    display: flex;
+    gap: 6px;
+    padding: 4px;
+    margin-bottom: 18px;
+    background: #eef2f6;
+    border-radius: 9px;
+  }
+
+  .tryby button {
+    flex: 1;
+    padding: 9px 6px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #687687;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .tryby button.aktywny {
+    background: #fff;
+    color: #2059a3;
+    box-shadow: 0 1px 4px #00000015;
+  }
+
+  #wynik {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid #dce2e8;
+  }
+
+  .wiersz {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #edf0f3;
+    font-size: 14px;
+  }
+
+  .wiersz:last-of-type {
+    border-bottom: 0;
+  }
+
+  .wiersz b {
+    text-align: right;
+    font-size: 16px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bez-przekroczenia {
+    color: #17643b;
+  }
+
+  .czerwony {
+    color: #a51d26;
+  }
+
+  .brak {
+    color: #aab2bc;
+  }
+
+  .alarm {
+    background: #fff1f1;
+    border-left: 3px solid #bb252c;
+    border-radius: 5px;
+    padding: 12px;
+    margin-top: 14px;
+    color: #a51d26;
+    font-size: 14px;
+  }
+
+  @media (max-width: 360px) {
+    main {
+      padding: 17px;
+    }
+
+    input {
+      font-size: 22px;
+    }
+  }
 </style>
 </head>
+
 <body>
+
 <main>
+
   <h1>Kalkulator nadgodzin</h1>
-  <div class="godziny">
-    <label>Od<input id="od" type="time" value="06:20" required></label>
-    <label>Do<input id="do" type="time" value="17:39" required></label>
+
+  <div class="tryby">
+    <button type="button"
+            id="tryb-zegar"
+            class="aktywny"
+            aria-pressed="true">
+      Zegar
+    </button>
+
+    <button type="button"
+            id="tryb-klawiatura"
+            aria-pressed="false">
+      Klawiatura
+    </button>
   </div>
-  <label class="nastepna">Następna służba od<input id="nastepna" type="time" value="06:20" required></label>
-  <section id="wynik" aria-live="polite"></section>
+
+  <div class="godziny">
+    <label>
+      Od
+      <input id="od" type="time" step="60" required>
+    </label>
+
+    <label>
+      Do
+      <input id="do" type="time" step="60" required>
+    </label>
+  </div>
+
+  <label class="nastepna">
+    Start następnej służby
+    <span class="opcjonalne">(opcjonalnie)</span>
+    <input id="nastepna" type="time" step="60">
+  </label>
+
+  <footer id="wynik" aria-live="polite"></footer>
+
 </main>
+
 <script>
+
   const DOBA = 1440;
   const PROG = 720;
+
   const pole = id => document.getElementById(id);
+  const pola = ['od', 'do', 'nastepna'];
+
+  function formatujGodzine(data) {
+    return String(data.getHours()).padStart(2, '0')
+      + ':'
+      + String(data.getMinutes()).padStart(2, '0');
+  }
+
+  // Ustawienie aktualnej godziny i początku 10 godzin wcześniej.
+
+  function ustawGodziny() {
+    const teraz = new Date();
+
+    const minutyTeraz =
+      teraz.getHours() * 60 + teraz.getMinutes();
+
+    const minutyPoczatku =
+      (minutyTeraz - 600 + DOBA) % DOBA;
+
+    pole('do').value = formatujGodzine(teraz);
+
+    pole('od').value =
+      String(Math.floor(minutyPoczatku / 60))
+        .padStart(2, '0')
+      + ':'
+      + String(minutyPoczatku % 60)
+        .padStart(2, '0');
+
+    pole('nastepna').value = '';
+  }
+
+  // Przełączanie pomiędzy zegarem a klawiaturą.
+
+  function zmienTryb(tryb) {
+    const klawiatura = tryb === 'klawiatura';
+
+    if (!klawiatura) {
+      for (const id of pola) {
+        const wartosc = pole(id).value;
+
+        if (wartosc && !Number.isFinite(minuty(wartosc))) {
+          pole(id).focus();
+          return;
+        }
+      }
+    }
+
+    pola.forEach(id => {
+      const input = pole(id);
+      const wartosc = input.value;
+
+      input.type = klawiatura ? 'text' : 'time';
+
+      if (klawiatura) {
+        input.inputMode = 'numeric';
+        input.maxLength = 5;
+        input.placeholder = 'HH:MM';
+      } else {
+        input.removeAttribute('inputmode');
+        input.removeAttribute('maxlength');
+        input.removeAttribute('placeholder');
+      }
+
+      input.value = wartosc;
+    });
+
+    pole('tryb-zegar').classList.toggle(
+      'aktywny', !klawiatura
+    );
+
+    pole('tryb-klawiatura').classList.toggle(
+      'aktywny', klawiatura
+    );
+
+    pole('tryb-zegar').setAttribute(
+      'aria-pressed', String(!klawiatura)
+    );
+
+    pole('tryb-klawiatura').setAttribute(
+      'aria-pressed', String(klawiatura)
+    );
+
+    oblicz();
+  }
+
+  pole('tryb-zegar').addEventListener('click', () => {
+    zmienTryb('zegar');
+  });
+
+  pole('tryb-klawiatura').addEventListener('click', () => {
+    zmienTryb('klawiatura');
+  });
+
+  // Automatyczne formatowanie wpisywanych cyfr.
+
+  function formatujWpis(input) {
+    if (input.type !== 'text') return;
+
+    let cyfry = input.value
+      .replace(/\D/g, '')
+      .slice(0, 4);
+
+    if (cyfry.length > 2) {
+      cyfry = cyfry.slice(0, 2)
+        + ':'
+        + cyfry.slice(2);
+    }
+
+    input.value = cyfry;
+  }
+
   function minuty(godzina) {
-    if (!/^\d{2}:\d{2}$/.test(godzina)) return NaN;
+    if (!/^\d{2}:\d{2}$/.test(godzina)) {
+      return NaN;
+    }
+
     const [h, m] = godzina.split(':').map(Number);
-    return h < 24 && m < 60 ? h * 60 + m : NaN;
+
+    return h < 24 && m < 60
+      ? h * 60 + m
+      : NaN;
   }
+
   function czas(m) {
-    const h = Math.floor(m / 60), min = m % 60;
-    return (h ? h + ' godz.' : '') + (h && min ? ' ' : '') + (min || !h ? min + ' min' : '');
+    const h = Math.floor(m / 60);
+    const min = m % 60;
+
+    return (h ? h + ' godz.' : '')
+      + (h && min ? ' ' : '')
+      + (min || !h ? min + ' min' : '');
   }
+
   function godzina(m) {
     const dzien = Math.floor(m / DOBA);
-    const h = Math.floor((m % DOBA) / 60), min = m % 60;
-    return String(h).padStart(2, '0') + ':' + String(min).padStart(2, '0') +
-      (dzien ? ' (+' + dzien + (dzien === 1 ? ' dzień)' : ' dni)') : '');
+    const h = Math.floor((m % DOBA) / 60);
+    const min = m % 60;
+
+    return String(h).padStart(2, '0')
+      + ':'
+      + String(min).padStart(2, '0')
+      + (
+        dzien
+          ? ' (+' + dzien
+            + (dzien === 1 ? ' dzień)' : ' dni)')
+          : ''
+      );
   }
+
   function policz(od, koniec, nastepna) {
-    if (![od, koniec, nastepna].every(Number.isFinite)) return null;
-    if (od === koniec) return { blad: true };
-    // Koniec wcześniejszy od początku oznacza przejście przez północ.
-    if (koniec < od) koniec += DOBA;
-    // Najbliższa godzina kolejnej służby nie wcześniejsza od końca obecnej.
-    nastepna += Math.floor(koniec / DOBA) * DOBA;
-    if (nastepna < koniec) nastepna += DOBA;
+
+    if (![od, koniec].every(Number.isFinite)) {
+      return null;
+    }
+
+    if (od === koniec) {
+      return { blad: true };
+    }
+
+    // Obsługa służby przechodzącej przez północ.
+
+    if (koniec < od) {
+      koniec += DOBA;
+    }
+
+    if (Number.isFinite(nastepna)) {
+
+      nastepna += Math.floor(koniec / DOBA) * DOBA;
+
+      if (nastepna < koniec) {
+        nastepna += DOBA;
+      }
+
+    } else {
+      nastepna = null;
+    }
+
     const sluzba = koniec - od;
-    const limit = Math.floor((nastepna - od) / 2);
-    const najwczesniej = sluzba >= PROG ? koniec + sluzba : null;
-    return { od, koniec, nastepna, sluzba, limit, najwczesniej,
-      nadgodziny: Math.max(0, limit - sluzba),
-      odpoczynek: nastepna - koniec };
+
+    const minimalny =
+      sluzba >= PROG ? sluzba : null;
+
+    const najwczesniej =
+      minimalny === null
+        ? null
+        : koniec + minimalny;
+
+    return {
+      od,
+      koniec,
+      nastepna,
+      sluzba,
+      minimalny,
+      najwczesniej,
+
+      przekroczenie:
+        Math.max(0, sluzba - PROG),
+
+      odpoczynek:
+        nastepna === null
+          ? null
+          : nastepna - koniec
+    };
   }
+
   function oblicz() {
+
     const wynik = pole('wynik');
-    const r = policz(...['od', 'do', 'nastepna'].map(id => minuty(pole(id).value)));
-    if (!r) { wynik.textContent = 'Wpisz wszystkie godziny.'; return; }
-    if (r.blad) { wynik.innerHTML = '<div class="alarm">Godziny Od i Do są identyczne. Nie można rozpoznać długości służby.</div>'; return; }
-    const problem = r.najwczesniej !== null && r.najwczesniej > r.nastepna;
-    const nieznany = r.limit < PROG && r.sluzba < PROG;
-    let html = `<div class="etykieta">Maksymalne nadgodziny bez zmiany kolejnej służby</div>
-      <strong class="liczba ${problem ? 'czerwony' : ''}">${nieznany ? '—' : r.nadgodziny + ' min'}</strong>
-      <div class="wiersz"><span>Długość służby</span><b>${czas(r.sluzba)}</b></div>`;
-    if (!nieznany && !problem) {
-      html += `<div class="wiersz"><span>Możesz pracować do</span><b>${godzina(r.od + r.limit)}</b></div>`;
+
+    const r = policz(
+      minuty(pole('od').value),
+      minuty(pole('do').value),
+      minuty(pole('nastepna').value)
+    );
+
+    if (!r) {
+      wynik.textContent =
+        'Wprowadź prawidłowe godziny Od i Do.';
+      return;
     }
-    if (r.sluzba >= PROG && (r.sluzba > PROG || problem)) {
-      html += `<div class="alarm"><p><b>${r.sluzba > PROG ? 'Służba powyżej 12 godz.' : 'Służba trwa 12 godz.'}</b> Odpoczynek: min. ${czas(r.sluzba)}.</p>
-        <p>Najwcześniejsza kolejna służba: <b>${godzina(r.najwczesniej)}</b></p>
-        ${problem ? `<p>Przesuń kolejny start o <b>${czas(r.najwczesniej - r.nastepna)}</b>.</p>` : ''}</div>`;
-    } else if (!nieznany && r.limit > PROG) {
-      html += `<div class="alarm"><p>Przy wykorzystaniu wszystkich nadgodzin służba przekroczy 12 godz.</p><p>Odpoczynek: min. <b>${czas(r.limit)}</b>.<br>Kolejna służba najwcześniej: <b>${godzina(r.od + 2 * r.limit)}</b>.</p></div>`;
+
+    if (r.blad) {
+      wynik.innerHTML = `
+        <div class="alarm">
+          Godziny Od i Do są identyczne.
+          Nie można określić długości służby.
+        </div>`;
+      return;
     }
-    if (nieznany) {
-      html += '<div class="alarm">Brak miejsca na 12 godz. służby i 12 godz. odpoczynku. Limit zależy od zasad odpoczynku przy krótszej służbie.</div>';
+
+    const klasaPrzekroczenia =
+      r.przekroczenie > 0
+        ? 'czerwony'
+        : 'bez-przekroczenia';
+
+    let html = `
+
+      <div class="wiersz">
+        <span>Całkowita długość służby:</span>
+        <b>${czas(r.sluzba)}</b>
+      </div>
+
+      <div class="wiersz">
+        <span>Przekroczony czas pracy:</span>
+        <b class="${klasaPrzekroczenia}">
+          ${czas(r.przekroczenie)}
+        </b>
+      </div>
+
+      <div class="wiersz">
+        <span>Minimalny odpoczynek:</span>
+        <b class="${r.minimalny === null ? 'brak' : ''}">
+          ${r.minimalny === null
+            ? '—'
+            : czas(r.minimalny)}
+        </b>
+      </div>
+
+      <div class="wiersz">
+        <span>Najwcześniejsza kolejna służba:</span>
+        <b class="${r.najwczesniej === null ? 'brak' : ''}">
+          ${r.najwczesniej === null
+            ? '—'
+            : godzina(r.najwczesniej)}
+        </b>
+      </div>
+
+    `;
+
+    if (
+      pole('nastepna').value !== ''
+      && !Number.isFinite(minuty(pole('nastepna').value))
+    ) {
+      html += `
+        <div class="alarm">
+          Wprowadź prawidłową godzinę następnej służby.
+        </div>`;
     }
-    if (r.odpoczynek === 0 && !problem) html += '<div class="alarm">Brak przerwy pomiędzy służbami.</div>';
+
+    if (
+      r.nastepna !== null
+      && (
+        (
+          r.najwczesniej !== null
+          && r.nastepna < r.najwczesniej
+        )
+        || r.odpoczynek === 0
+      )
+    ) {
+      html += `
+        <div class="alarm">
+          <b>Krótki odpoczynek.</b>
+          Brak możliwości rozpoczęcia następnej służby
+          o zaplanowanej godzinie.
+        </div>
+      `;
+    }
+
     wynik.innerHTML = html;
   }
-  document.querySelectorAll('input').forEach(input => input.addEventListener('input', oblicz));
+
+  pola.forEach(id => {
+
+    const input = pole(id);
+
+    input.addEventListener('input', () => {
+      formatujWpis(input);
+      oblicz();
+    });
+
+    input.addEventListener('change', oblicz);
+
+  });
+
+  ustawGodziny();
   oblicz();
+
 </script>
+
 </body>
 </html>
