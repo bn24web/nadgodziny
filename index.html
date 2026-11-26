@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalkulator nadgodzin</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 16px 12px; background: #eef2f6; color: #172334; font: 16px/1.45 system-ui, sans-serif; }
+  main { max-width: 440px; margin: auto; padding: 24px; background: #fff; border-radius: 14px; }
+  h1 { margin: 0 0 20px; font-size: 24px; }
+  .godziny { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  label { display: block; font-weight: 600; min-width: 0; }
+  input { display: block; width: 100%; min-width: 0; margin-top: 6px; padding: 12px 10px; border: 1px solid #aab6c5; border-radius: 7px; background: #fff; color: inherit; font: inherit; font-size: 20px; }
+  input:focus-visible { outline: 2px solid #2059a3; outline-offset: 2px; }
+  .nastepna { margin-top: 16px; }
+  #wynik { margin-top: 22px; padding-top: 18px; border-top: 1px solid #dce2e8; }
+  .etykieta { color: #526071; font-size: 14px; }
+  .liczba { display: block; font-size: 36px; font-weight: 750; color: #17643b; line-height: 1.2; margin: 3px 0 14px; }
+  .wiersz { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 7px 0; }
+  .wiersz b { text-align: right; font-variant-numeric: tabular-nums; }
+  .alarm { background: #fff1f1; border-left: 3px solid #bb252c; border-radius: 5px; padding: 11px 12px; margin-top: 14px; color: #a51d26; font-size: 14px; }
+  .alarm p { margin: 0; }
+  .alarm p + p { margin-top: 5px; }
+  .czerwony { color: #a51d26; }
+  @media (max-width: 360px) { main { padding: 17px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Kalkulator nadgodzin</h1>
+  <div class="godziny">
+    <label>Od<input id="od" type="time" value="06:20" required></label>
+    <label>Do<input id="do" type="time" value="17:39" required></label>
+  </div>
+  <label class="nastepna">Następna służba od<input id="nastepna" type="time" value="06:20" required></label>
+  <section id="wynik" aria-live="polite"></section>
+</main>
+<script>
+  const DOBA = 1440;
+  const PROG = 720;
+  const pole = id => document.getElementById(id);
+  function minuty(godzina) {
+    if (!/^\d{2}:\d{2}$/.test(godzina)) return NaN;
+    const [h, m] = godzina.split(':').map(Number);
+    return h < 24 && m < 60 ? h * 60 + m : NaN;
+  }
+  function czas(m) {
+    const h = Math.floor(m / 60), min = m % 60;
+    return (h ? h + ' godz.' : '') + (h && min ? ' ' : '') + (min || !h ? min + ' min' : '');
+  }
+  function godzina(m) {
+    const dzien = Math.floor(m / DOBA);
+    const h = Math.floor((m % DOBA) / 60), min = m % 60;
+    return String(h).padStart(2, '0') + ':' + String(min).padStart(2, '0') +
+      (dzien ? ' (+' + dzien + (dzien === 1 ? ' dzień)' : ' dni)') : '');
+  }
+  function policz(od, koniec, nastepna) {
+    if (![od, koniec, nastepna].every(Number.isFinite)) return null;
+    if (od === koniec) return { blad: true };
+    // Koniec wcześniejszy od początku oznacza przejście przez północ.
+    if (koniec < od) koniec += DOBA;
+    // Najbliższa godzina kolejnej służby nie wcześniejsza od końca obecnej.
+    nastepna += Math.floor(koniec / DOBA) * DOBA;
+    if (nastepna < koniec) nastepna += DOBA;
+    const sluzba = koniec - od;
+    const limit = Math.floor((nastepna - od) / 2);
+    const najwczesniej = sluzba >= PROG ? koniec + sluzba : null;
+    return { od, koniec, nastepna, sluzba, limit, najwczesniej,
+      nadgodziny: Math.max(0, limit - sluzba),
+      odpoczynek: nastepna - koniec };
+  }
+  function oblicz() {
+    const wynik = pole('wynik');
+    const r = policz(...['od', 'do', 'nastepna'].map(id => minuty(pole(id).value)));
+    if (!r) { wynik.textContent = 'Wpisz wszystkie godziny.'; return; }
+    if (r.blad) { wynik.innerHTML = '<div class="alarm">Godziny Od i Do są identyczne. Nie można rozpoznać długości służby.</div>'; return; }
+    const problem = r.najwczesniej !== null && r.najwczesniej > r.nastepna;
+    const nieznany = r.limit < PROG && r.sluzba < PROG;
+    let html = `<div class="etykieta">Maksymalne nadgodziny bez zmiany kolejnej służby</div>
+      <strong class="liczba ${problem ? 'czerwony' : ''}">${nieznany ? '—' : r.nadgodziny + ' min'}</strong>
+      <div class="wiersz"><span>Długość służby</span><b>${czas(r.sluzba)}</b></div>`;
+    if (!nieznany && !problem) {
+      html += `<div class="wiersz"><span>Możesz pracować do</span><b>${godzina(r.od + r.limit)}</b></div>`;
+    }
+    if (r.sluzba >= PROG && (r.sluzba > PROG || problem)) {
+      html += `<div class="alarm"><p><b>${r.sluzba > PROG ? 'Służba powyżej 12 godz.' : 'Służba trwa 12 godz.'}</b> Odpoczynek: min. ${czas(r.sluzba)}.</p>
+        <p>Najwcześniejsza kolejna służba: <b>${godzina(r.najwczesniej)}</b></p>
+        ${problem ? `<p>Przesuń kolejny start o <b>${czas(r.najwczesniej - r.nastepna)}</b>.</p>` : ''}</div>`;
+    } else if (!nieznany && r.limit > PROG) {
+      html += `<div class="alarm"><p>Przy wykorzystaniu wszystkich nadgodzin służba przekroczy 12 godz.</p><p>Odpoczynek: min. <b>${czas(r.limit)}</b>.<br>Kolejna służba najwcześniej: <b>${godzina(r.od + 2 * r.limit)}</b>.</p></div>`;
+    }
+    if (nieznany) {
+      html += '<div class="alarm">Brak miejsca na 12 godz. służby i 12 godz. odpoczynku. Limit zależy od zasad odpoczynku przy krótszej służbie.</div>';
+    }
+    if (r.odpoczynek === 0 && !problem) html += '<div class="alarm">Brak przerwy pomiędzy służbami.</div>';
+    wynik.innerHTML = html;
+  }
+  document.querySelectorAll('input').forEach(input => input.addEventListener('input', oblicz));
+  oblicz();
+</script>
+</body>
+</html>
