@@ -7,313 +7,275 @@
 <title>Kalkulator nadgodzin</title>
 
 <style>
-  * {
-    box-sizing: border-box;
-  }
+* { box-sizing: border-box; }
 
-  body {
-    margin: 0;
-    padding: 16px 12px;
-    background: #eef2f6;
-    color: #172334;
-    font: 16px/1.45 system-ui, sans-serif;
-  }
+body {
+  margin: 0;
+  padding: 16px 12px;
+  background: #eef2f6;
+  color: #172334;
+  font: 16px/1.45 system-ui,sans-serif;
+}
 
-  main {
-    max-width: 440px;
-    margin: auto;
-    padding: 24px;
-    background: #fff;
-    border-radius: 14px;
-  }
+main {
+  max-width: 440px;
+  margin: auto;
+  padding: 24px;
+  background: #fff;
+  border-radius: 14px;
+}
 
-  h1 {
-    margin: 0 0 20px;
-    font-size: 24px;
-  }
+h1 {
+  margin: 0 0 20px;
+  font-size: 24px;
+}
 
-  .godziny {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
+button, input { font: inherit; }
+button { cursor: pointer; }
 
-  label {
-    display: block;
-    font-weight: 600;
-  }
+[hidden] {
+  display: none !important;
+}
 
-  .pole-czasu {
-    display: block;
-    width: 100%;
-    margin-top: 6px;
-    padding: 12px;
-    border: 1px solid #aab6c5;
-    border-radius: 8px;
-    background: #fff;
-    color: #172334;
-    font: inherit;
-    font-size: 28px;
-    font-weight: 600;
-    text-align: center;
-    font-variant-numeric: tabular-nums;
-    cursor: pointer;
-  }
+button:focus-visible,
+input:focus-visible,
+#tarcza:focus-visible {
+  outline: 2px solid #465b96;
+  outline-offset: 3px;
+}
 
-  .pole-czasu:focus-visible {
-    outline: 2px solid #465b96;
-    outline-offset: 3px;
-  }
+.godziny {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
 
-  .pole-czasu.puste {
-    color: #aab2bc;
-  }
+label {
+  display: block;
+  font-weight: 600;
+}
 
-  .nastepna {
-    margin-top: 16px;
-  }
+.pole-czasu {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 12px;
+  border: 1px solid #aab6c5;
+  border-radius: 8px;
+  background: #fff;
+  color: #172334;
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
 
-  .opcjonalne {
-    color: #8993a0;
-    font-size: 12px;
-    font-weight: 400;
-  }
+.puste, .brak {
+  color: #8993a0;
+}
 
-  .wyczysc {
-    display: block;
-    margin: 6px 0 0 auto;
-    border: 0;
-    background: transparent;
-    color: #526071;
-    font-size: 12px;
-    cursor: pointer;
-  }
+.nastepna {
+  margin-top: 16px;
+}
 
-  #wynik {
-    margin-top: 22px;
-    padding-top: 16px;
-    border-top: 1px solid #dce2e8;
-  }
+.opcjonalne {
+  color: #687687;
+  font-size: 12px;
+  font-weight: 400;
+}
 
-  .wiersz {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid #edf0f3;
-    font-size: 14px;
-  }
+.wyczysc {
+  display: block;
+  margin: 6px 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: #526071;
+  font-size: 12px;
+}
 
-  .wiersz b {
-    text-align: right;
-    font-size: 16px;
-    font-variant-numeric: tabular-nums;
-  }
+#wynik {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid #dce2e8;
+}
 
-  .bez-przekroczenia {
-    color: #17643b;
-  }
+.wiersz {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #edf0f3;
+  font-size: 14px;
+}
 
-  .czerwony {
-    color: #a51d26;
-  }
+.wiersz b {
+  text-align: right;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
 
-  .brak {
-    color: #aab2bc;
-  }
+.zielony { color: #17643b; }
+.czerwony { color: #a51d26; }
 
-  .alarm {
-    background: #fff1f1;
-    border-left: 3px solid #bb252c;
-    border-radius: 5px;
-    padding: 12px;
-    margin-top: 14px;
-    color: #a51d26;
-    font-size: 14px;
-  }
+.alarm {
+  background: #fff1f1;
+  border-left: 3px solid #bb252c;
+  border-radius: 5px;
+  padding: 12px;
+  margin-top: 14px;
+  color: #a51d26;
+  font-size: 14px;
+}
 
-  /* Graficzny Time Picker */
+/* TIME PICKER */
 
-  dialog {
-    width: min(340px, calc(100vw - 24px));
-    max-height: calc(100vh - 24px);
-    max-height: calc(100dvh - 24px);
-    padding: 20px;
-    border: 0;
-    border-radius: 25px;
-    background: #f0eff7;
-    color: #202332;
-    box-shadow: 0 12px 50px #0004;
-    overflow: auto;
-  }
+dialog {
+  width: min(350px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  padding: 20px;
+  border: 0;
+  border-radius: 25px;
+  background: #f0eff7;
+  color: #202332;
+  box-shadow: 0 12px 50px #0004;
+  overflow: auto;
+}
 
-  dialog::backdrop {
-    background: rgba(0, 0, 0, .5);
-  }
+dialog::backdrop {
+  background: #0008;
+}
 
-  .picker-tytul {
-    margin-bottom: 16px;
-    font-size: 14px;
-    color: #515665;
-  }
+#picker-tytul {
+  color: #515665;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
 
-  .picker-czas {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 7px;
-    margin-bottom: 20px;
-    font-size: 38px;
-  }
+.picker-czas,
+.wpis-czas {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 36px;
+}
 
-  .picker-czas button {
-    width: 100px;
-    padding: 10px;
-    border: 0;
-    border-radius: 8px;
-    background: #dedfe9;
-    color: #202332;
-    font: inherit;
-    font-size: 44px;
-    font-variant-numeric: tabular-nums;
-    cursor: pointer;
-  }
+.picker-czas button,
+.wpis-czas input {
+  width: 100px;
+  min-width: 0;
+  padding: 10px 4px;
+  border: 0;
+  border-radius: 8px;
+  background: #dedfe9;
+  color: #202332;
+  font-size: 44px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
 
-  .picker-czas button.aktywny {
-    background: #cdd5f5;
-    color: #182341;
-  }
+.picker-czas button.aktywny,
+.wpis-czas input:focus {
+  background: #cdd5f5;
+  color: #182341;
+}
 
-  .tarcza {
-    position: relative;
-    width: 100%;
-    max-width: 280px;
-    aspect-ratio: 1;
-    margin: auto;
-    border-radius: 50%;
-    background: #dbdce8;
-    touch-action: manipulation;
-    user-select: none;
-    cursor: pointer;
-  }
+.wpis-czas label {
+  font-size: 12px;
+  color: #515665;
+  font-weight: 400;
+  text-align: center;
+}
 
-  .numer {
-    position: absolute;
-    z-index: 2;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    border: 0;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    background: transparent;
-    color: #202332;
-    font: inherit;
-    font-size: 15px;
-    cursor: pointer;
-  }
+.wpis-czas input {
+  display: block;
+}
 
-  .numer.wewnetrzny {
-    font-size: 12px;
-    width: 28px;
-    height: 28px;
-  }
+/* Tarcza z płynną obsługą dotyku */
 
-  .numer.wybrany {
-    color: white;
-    font-weight: 600;
-    background: #465b96;
-  }
+#tarcza {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  aspect-ratio: 1;
+  margin: auto;
+  touch-action: none;
+  user-select: none;
+  cursor: pointer;
+  border-radius: 50%;
+}
 
-  .wskazowka {
-    position: absolute;
-    z-index: 1;
-    bottom: 50%;
-    left: 50%;
-    width: 2px;
-    background: #465b96;
-    transform-origin: bottom center;
-    pointer-events: none;
-  }
+#tarcza * {
+  pointer-events: none;
+}
 
-  .wskazowka::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    background: #465b96;
-  }
+.korekta {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
 
-  .srodek {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    background: #465b96;
-    pointer-events: none;
-  }
+.korekta button {
+  border: 1px solid #c4c7d5;
+  border-radius: 20px;
+  padding: 7px 16px;
+  background: transparent;
+  color: #465b96;
+  font-weight: 600;
+}
 
-  .korekta-minut {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-top: 14px;
-  }
+.picker-przyciski {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 20px;
+}
 
-  .korekta-minut[hidden] {
-    display: none;
-  }
+.picker-przyciski button {
+  border: 0;
+  border-radius: 20px;
+  padding: 10px 14px;
+  background: transparent;
+  color: #465b96;
+  font-size: 14px;
+  font-weight: 600;
+}
 
-  .korekta-minut button {
-    border: 1px solid #c4c7d5;
-    border-radius: 20px;
-    padding: 8px 18px;
-    background: transparent;
-    color: #465b96;
-    font-weight: 600;
-    cursor: pointer;
-  }
+#zmien-tryb {
+  margin-right: auto;
+  padding: 9px;
+}
 
-  .picker-przyciski {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-  }
+#zmien-tryb svg {
+  display: block;
+  width: 23px;
+  height: 23px;
+}
 
-  .picker-przyciski button {
-    border: 0;
-    border-radius: 20px;
-    padding: 10px 20px;
-    background: transparent;
-    color: #465b96;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-  }
+#zatwierdz {
+  background: #465b96;
+  color: white;
+}
 
-  .picker-przyciski .ok {
-    background: #465b96;
-    color: #fff;
-  }
+#zatwierdz:disabled {
+  opacity: .45;
+  cursor: default;
+}
 
-  @media (max-width: 360px) {
-    main {
-      padding: 17px;
-    }
+#blad-wpisu {
+  color: #a51d26;
+  font-size: 13px;
+  text-align: center;
+}
 
-    .pole-czasu {
-      font-size: 24px;
-    }
-  }
+@media(max-width:360px) {
+  main { padding: 17px; }
+  dialog { padding: 16px; }
+}
 </style>
 </head>
 
@@ -351,9 +313,7 @@
 
     <label for="nastepna">
       Start następnej służby
-      <span class="opcjonalne">
-        (opcjonalnie)
-      </span>
+      <span class="opcjonalne">(opcjonalnie)</span>
     </label>
 
     <button id="nastepna"
@@ -364,9 +324,9 @@
       --:--
     </button>
 
-    <button type="button"
-            id="wyczysc"
+    <button id="wyczysc"
             class="wyczysc"
+            type="button"
             hidden>
       Wyczyść godzinę
     </button>
@@ -377,578 +337,885 @@
 
 </main>
 
-<!-- Graficzny Time Picker -->
+<!-- OKNO WYBORU CZASU -->
 
 <dialog id="picker" aria-labelledby="picker-tytul">
 
-  <div class="picker-tytul" id="picker-tytul">
+  <div id="picker-tytul">
     Wybierz godzinę
   </div>
 
-  <div class="picker-czas">
+  <!-- Tryb graficzny -->
 
-    <button type="button"
-            id="picker-godzina"
-            aria-label="Wybierz godziny">
-      00
-    </button>
+  <div id="widok-zegara">
 
-    <span>:</span>
+    <div class="picker-czas">
 
-    <button type="button"
-            id="picker-minuta"
-            aria-label="Wybierz minuty">
-      00
-    </button>
+      <button id="picker-godzina"
+              type="button"
+              aria-label="Wybierz godziny">
+        00
+      </button>
+
+      <span>:</span>
+
+      <button id="picker-minuta"
+              type="button"
+              aria-label="Wybierz minuty">
+        00
+      </button>
+
+    </div>
+
+    <svg id="tarcza"
+         viewBox="0 0 280 280"
+         role="slider"
+         tabindex="0"
+         aria-label="Godzina"
+         aria-valuemin="0"
+         aria-valuemax="23"
+         aria-valuenow="0">
+    </svg>
+
+    <div id="korekta" class="korekta" hidden>
+
+      <button type="button" id="minus">
+        −1 min
+      </button>
+
+      <button type="button" id="plus">
+        +1 min
+      </button>
+
+    </div>
 
   </div>
 
-  <div id="tarcza" class="tarcza"></div>
+  <!-- Tryb klawiaturowy -->
 
-  <div id="korekta" class="korekta-minut" hidden>
-    <button type="button" id="minus">
-      −1 min
-    </button>
-    <button type="button" id="plus">
-      +1 min
-    </button>
+  <div id="widok-klawiatury" hidden>
+
+    <div class="wpis-czas">
+
+      <label>
+        <input id="wpis-h"
+               type="text"
+               inputmode="numeric"
+               maxlength="2"
+               autocomplete="off"
+               aria-label="Godzina">
+        Godzina
+      </label>
+
+      <span>:</span>
+
+      <label>
+        <input id="wpis-m"
+               type="text"
+               inputmode="numeric"
+               maxlength="2"
+               autocomplete="off"
+               aria-label="Minuty">
+        Minuty
+      </label>
+
+    </div>
+
+    <p id="blad-wpisu" hidden>
+      Wpisz godzinę 0–23 i minuty 0–59.
+    </p>
+
   </div>
 
   <div class="picker-przyciski">
-    <button type="button" id="anuluj">
+
+    <button id="zmien-tryb"
+            type="button"
+            title="Wpisz godzinę"
+            aria-label="Wpisz godzinę">
+    </button>
+
+    <button id="anuluj" type="button">
       Anuluj
     </button>
-    <button type="button" id="zatwierdz" class="ok">
+
+    <button id="zatwierdz" type="button">
       OK
     </button>
+
   </div>
 
 </dialog>
 
 <script>
 
-  const DOBA = 1440;
-  const PROG = 720;
+'use strict';
 
-  const pole = id => document.getElementById(id);
+const DOBA = 1440;
+const PROG = 720;
 
-  const pola = ['od', 'do', 'nastepna'];
+const $ = id => document.getElementById(id);
 
-  const dwa = n => String(n).padStart(2, '0');
+const dwa = n => String(n).padStart(2, '0');
 
-  let aktywnePole = null;
-  let wybranaGodzina = 0;
-  let wybranaMinuta = 0;
-  let tryb = 'godzina';
+const format = n =>
+  dwa(Math.floor(n / 60) % 24)
+  + ':'
+  + dwa(n % 60);
 
-  function ustawPole(id, wartosc) {
+const tarcza = $('tarcza');
 
-    const el = pole(id);
+let aktywnePole = null;
+let h = 0;
+let m = 0;
+let tryb = 'godzina';
+let klawiatura = false;
+let drag = null;
 
-    el.dataset.value = wartosc;
-    el.textContent = wartosc || '--:--';
+const ikonaKlawiatury = `
+  <svg viewBox="0 0 24 24"
+       fill="none"
+       stroke="currentColor"
+       stroke-width="1.7"
+       stroke-linecap="round">
 
-    el.classList.toggle('puste', !wartosc);
+    <rect x="2" y="5" width="20" height="14" rx="2"/>
 
-    pole('wyczysc').hidden =
-      !pole('nastepna').dataset.value;
+    <path d="
+      M6 9h.01
+      M10 9h.01
+      M14 9h.01
+      M18 9h.01
+      M6 12.5h.01
+      M10 12.5h.01
+      M14 12.5h.01
+      M18 12.5h.01
+      M8 16h8"/>
+
+  </svg>`;
+
+const ikonaZegara = `
+  <svg viewBox="0 0 24 24"
+       fill="none"
+       stroke="currentColor"
+       stroke-width="1.7"
+       stroke-linecap="round">
+
+    <circle cx="12" cy="12" r="9"/>
+    <path d="M12 6v6l4 2"/>
+
+  </svg>`;
+
+// Ustawianie wartości pól.
+
+function ustawPole(id, v) {
+
+  const el = $(id);
+
+  el.dataset.value = v;
+  el.textContent = v || '--:--';
+
+  el.classList.toggle('puste', !v);
+
+  $('wyczysc').hidden =
+    !$('nastepna').dataset.value;
+}
+
+// Godziny domyślne:
+// Do = teraz, Od = 10 godzin wcześniej.
+
+function ustawGodziny() {
+
+  const t = new Date();
+
+  const n =
+    t.getHours() * 60 + t.getMinutes();
+
+  ustawPole('do', format(n));
+
+  ustawPole(
+    'od',
+    format((n - 600 + DOBA) % DOBA)
+  );
+
+  ustawPole('nastepna', '');
+}
+
+// Otwarcie selektora czasu.
+
+function otworzPicker(id) {
+
+  aktywnePole = id;
+
+  const t = new Date();
+  const v = $(id).dataset.value;
+
+  [h, m] = v
+    ? v.split(':').map(Number)
+    : [t.getHours(), t.getMinutes()];
+
+  tryb = 'godzina';
+  drag = null;
+
+  ustawTryb(false);
+
+  $('picker').showModal();
+}
+
+// Zmiana zegar / klawiatura.
+
+function ustawTryb(wpis) {
+
+  klawiatura = wpis;
+
+  $('widok-zegara').hidden = wpis;
+  $('widok-klawiatury').hidden = !wpis;
+
+  $('zmien-tryb').innerHTML =
+    wpis ? ikonaZegara : ikonaKlawiatury;
+
+  $('zmien-tryb').title =
+    wpis ? 'Wybierz na zegarze' : 'Wpisz godzinę';
+
+  $('zmien-tryb').setAttribute(
+    'aria-label',
+    $('zmien-tryb').title
+  );
+
+  if (wpis) {
+
+    $('wpis-h').value = dwa(h);
+    $('wpis-m').value = dwa(m);
+
+    sprawdzWpis();
+
+  } else {
+
+    $('zatwierdz').disabled = false;
+
+    rysuj();
+
+  }
+}
+
+// Walidacja wpisywanej godziny.
+
+function sprawdzWpis() {
+
+  const a = $('wpis-h').value;
+  const b = $('wpis-m').value;
+
+  const ok =
+    /^\d{1,2}$/.test(a)
+    && /^\d{1,2}$/.test(b)
+    && Number(a) < 24
+    && Number(b) < 60;
+
+  $('blad-wpisu').hidden = ok;
+  $('zatwierdz').disabled = !ok;
+
+  if (ok) {
+    h = Number(a);
+    m = Number(b);
   }
 
-  function ustawGodziny() {
+  return ok;
+}
 
-    const teraz = new Date();
+$('zmien-tryb').onclick = () => {
 
-    const minutyTeraz =
-      teraz.getHours() * 60 + teraz.getMinutes();
-
-    const poczatek =
-      (minutyTeraz - 600 + DOBA) % DOBA;
-
-    ustawPole(
-      'do',
-      dwa(teraz.getHours()) + ':' +
-      dwa(teraz.getMinutes())
-    );
-
-    ustawPole(
-      'od',
-      dwa(Math.floor(poczatek / 60)) + ':' +
-      dwa(poczatek % 60)
-    );
-
-    ustawPole('nastepna', '');
+  if (klawiatura && !sprawdzWpis()) {
+    return;
   }
 
-  // Otwarcie graficznego zegara.
+  ustawTryb(!klawiatura);
 
-  function otworzPicker(id) {
+  if (klawiatura) {
 
-    aktywnePole = id;
+    $('wpis-h').focus();
+    $('wpis-h').select();
 
-    const wartosc = pole(id).dataset.value;
+  }
+};
 
-    if (wartosc) {
+for (const id of ['wpis-h', 'wpis-m']) {
 
-      [wybranaGodzina, wybranaMinuta] =
-        wartosc.split(':').map(Number);
+  $(id).addEventListener('input', e => {
+
+    e.target.value = e.target.value
+      .replace(/\D/g, '')
+      .slice(0, 2);
+
+    sprawdzWpis();
+
+  });
+
+  $(id).addEventListener('focus', e => {
+    e.target.select();
+  });
+}
+
+// Wyliczanie współrzędnych punktów zegara.
+
+function punkt(kat, r) {
+
+  const a = kat * Math.PI / 180;
+
+  return [
+    140 + r * Math.sin(a),
+    140 - r * Math.cos(a)
+  ];
+}
+
+// Rysowanie tarczy SVG.
+
+function rysuj() {
+
+  const godziny = tryb === 'godzina';
+  const val = godziny ? h : m;
+
+  $('picker-tytul').textContent =
+    godziny ? 'Wybierz godzinę' : 'Wybierz minuty';
+
+  $('picker-godzina').textContent = dwa(h);
+  $('picker-minuta').textContent = dwa(m);
+
+  $('picker-godzina').classList.toggle(
+    'aktywny', godziny
+  );
+
+  $('picker-minuta').classList.toggle(
+    'aktywny', !godziny
+  );
+
+  $('picker-godzina').setAttribute(
+    'aria-pressed', String(godziny)
+  );
+
+  $('picker-minuta').setAttribute(
+    'aria-pressed', String(!godziny)
+  );
+
+  $('korekta').hidden = godziny;
+
+  tarcza.setAttribute(
+    'aria-label',
+    godziny ? 'Godzina' : 'Minuty'
+  );
+
+  tarcza.setAttribute(
+    'aria-valuemax',
+    godziny ? '23' : '59'
+  );
+
+  tarcza.setAttribute('aria-valuenow', val);
+
+  let svg = `
+    <circle cx="140"
+            cy="140"
+            r="139"
+            fill="#dbdce8"/>
+  `;
+
+  // Pełna podziałka 60 minut.
+
+  if (!godziny) {
+
+    for (let i = 0; i < 60; i++) {
+
+      const [x1, y1] = punkt(
+        i * 6,
+        i % 5 === 0 ? 126 : 130
+      );
+
+      const [x2, y2] = punkt(i * 6, 135);
+
+      svg += `
+        <line x1="${x1}"
+              y1="${y1}"
+              x2="${x2}"
+              y2="${y2}"
+              stroke="#7c839d"
+              stroke-width="${i % 5 === 0 ? 2 : 1}"/>
+      `;
+    }
+  }
+
+  // Położenie wskazówki.
+
+  const [x, y] = punkt(
+    godziny ? (h % 12) * 30 : m * 6,
+    godziny && h >= 12 ? 73 : 110
+  );
+
+  svg += `
+    <line x1="140"
+          y1="140"
+          x2="${x}"
+          y2="${y}"
+          stroke="#465b96"
+          stroke-width="2"/>
+
+    <circle cx="140"
+            cy="140"
+            r="4"
+            fill="#465b96"/>
+  `;
+
+  // Oznaczenia godzin lub minut.
+
+  const liczby = godziny
+    ? Array.from({length:24}, (_,i) => i)
+    : Array.from({length:12}, (_,i) => i * 5);
+
+  for (const n of liczby) {
+
+    if (n === val) continue;
+
+    const [a, b] = punkt(
+      godziny ? (n % 12) * 30 : n * 6,
+      godziny && n >= 12 ? 73 : 110
+    );
+
+    svg += `
+      <text x="${a}"
+            y="${b}"
+            text-anchor="middle"
+            dominant-baseline="central"
+            fill="#202332"
+            font-size="${godziny && n >= 12 ? 13 : 16}">
+        ${godziny ? n : dwa(n)}
+      </text>
+    `;
+  }
+
+  // Wybrana wartość na końcu wskazówki.
+
+  svg += `
+    <circle cx="${x}"
+            cy="${y}"
+            r="17"
+            fill="#465b96"/>
+
+    <text x="${x}"
+          y="${y}"
+          text-anchor="middle"
+          dominant-baseline="central"
+          fill="white"
+          font-size="15"
+          font-weight="600">
+      ${godziny ? h : dwa(m)}
+    </text>
+  `;
+
+  tarcza.innerHTML = svg;
+}
+
+// Wybieranie wartości z dokładnością do 1 minuty.
+
+function wybierzPunkt(e) {
+
+  const r = tarcza.getBoundingClientRect();
+
+  const x =
+    (e.clientX - r.left - r.width / 2)
+    * 280 / r.width;
+
+  const y =
+    (e.clientY - r.top - r.height / 2)
+    * 280 / r.height;
+
+  const d = Math.hypot(x, y);
+
+  // Martwa strefa na środku tarczy.
+  if (d < 25) return false;
+
+  const a = (
+    Math.atan2(x, -y) * 180 / Math.PI + 360
+  ) % 360;
+
+  if (tryb === 'godzina') {
+
+    h = Math.round(a / 30) % 12
+      + (d < 92 ? 12 : 0);
+
+  } else {
+
+    m = Math.round(a / 6) % 60;
+
+  }
+
+  rysuj();
+
+  return true;
+}
+
+// Płynne przeciąganie wskazówki.
+// Obsługuje mysz, palec i rysik.
+
+tarcza.addEventListener('pointerdown', e => {
+
+  if (drag !== null || e.button !== 0) {
+    return;
+  }
+
+  e.preventDefault();
+
+  if (!wybierzPunkt(e)) {
+    return;
+  }
+
+  drag = e.pointerId;
+
+  tarcza.setPointerCapture(drag);
+
+});
+
+tarcza.addEventListener('pointermove', e => {
+
+  if (e.pointerId === drag) {
+    wybierzPunkt(e);
+  }
+
+});
+
+tarcza.addEventListener('pointerup', e => {
+
+  if (e.pointerId !== drag) {
+    return;
+  }
+
+  wybierzPunkt(e);
+
+  drag = null;
+
+  if (tarcza.hasPointerCapture(e.pointerId)) {
+
+    tarcza.releasePointerCapture(e.pointerId);
+
+  }
+
+  // Po wybraniu godziny automatycznie
+  // przejdź do wyboru minut.
+
+  if (tryb === 'godzina') {
+
+    tryb = 'minuta';
+
+    rysuj();
+
+  }
+
+});
+
+for (const event of [
+  'pointercancel',
+  'lostpointercapture'
+]) {
+
+  tarcza.addEventListener(event, () => {
+    drag = null;
+  });
+
+}
+
+// Dodatkowa obsługa strzałek na komputerze.
+
+tarcza.addEventListener('keydown', e => {
+
+  const delta =
+    ['ArrowRight', 'ArrowUp'].includes(e.key)
+      ? 1
+      : ['ArrowLeft', 'ArrowDown'].includes(e.key)
+        ? -1
+        : 0;
+
+  if (delta) {
+
+    e.preventDefault();
+
+    if (tryb === 'godzina') {
+
+      h = (h + delta + 24) % 24;
 
     } else {
 
-      const teraz = new Date();
-
-      wybranaGodzina = teraz.getHours();
-      wybranaMinuta = teraz.getMinutes();
+      m = (m + delta + 60) % 60;
 
     }
 
-    tryb = 'godzina';
+    rysuj();
 
-    rysujTarcze();
-
-    pole('picker').showModal();
-  }
-
-  // Budowanie tarczy zegara.
-
-  function rysujTarcze() {
-
-    const tarcza = pole('tarcza');
-
-    tarcza.replaceChildren();
-
-    const godziny = tryb === 'godzina';
-
-    pole('picker-tytul').textContent =
-      godziny ? 'Wybierz godzinę' : 'Wybierz minuty';
-
-    pole('picker-godzina').textContent =
-      dwa(wybranaGodzina);
-
-    pole('picker-minuta').textContent =
-      dwa(wybranaMinuta);
-
-    pole('picker-godzina').classList.toggle(
-      'aktywny', godziny
-    );
-
-    pole('picker-minuta').classList.toggle(
-      'aktywny', !godziny
-    );
-
-    pole('picker-godzina').setAttribute(
-      'aria-pressed', String(godziny)
-    );
-
-    pole('picker-minuta').setAttribute(
-      'aria-pressed', String(!godziny)
-    );
-
-    pole('korekta').hidden = godziny;
-
-    const kat = godziny
-      ? (wybranaGodzina % 12) * 30
-      : wybranaMinuta * 6;
-
-    const promien =
-      godziny && wybranaGodzina >= 12
-        ? 27
-        : 41;
-
-    const wskazowka = document.createElement('div');
-
-    wskazowka.className = 'wskazowka';
-    wskazowka.style.height = promien + '%';
-
-    wskazowka.style.transform =
-      'translateX(-50%) rotate(' + kat + 'deg)';
-
-    tarcza.appendChild(wskazowka);
-
-    const srodek = document.createElement('div');
-
-    srodek.className = 'srodek';
-
-    tarcza.appendChild(srodek);
-
-    if (godziny) {
-
-      for (let h = 0; h < 24; h++) {
-
-        dodajNumer(
-          h,
-          h % 12,
-          h >= 12 ? 27 : 41,
-          h === wybranaGodzina,
-          h >= 12
-        );
-
-      }
-
-    } else {
-
-      for (let m = 0; m < 60; m += 5) {
-
-        dodajNumer(
-          m,
-          m / 5,
-          41,
-          m === wybranaMinuta,
-          false
-        );
-
-      }
-
-    }
-  }
-
-  function dodajNumer(
-    wartosc,
-    pozycja,
-    promien,
-    wybrany,
-    wewnetrzny
+  } else if (
+    e.key === 'Enter'
+    && tryb === 'godzina'
   ) {
 
-    const rad = pozycja * Math.PI / 6;
+    e.preventDefault();
 
-    const x = 50 + promien * Math.sin(rad);
-    const y = 50 - promien * Math.cos(rad);
-
-    const btn = document.createElement('button');
-
-    btn.type = 'button';
-    btn.className = 'numer';
-
-    if (wewnetrzny) {
-      btn.classList.add('wewnetrzny');
-    }
-
-    if (wybrany) {
-      btn.classList.add('wybrany');
-    }
-
-    btn.style.left = x + '%';
-    btn.style.top = y + '%';
-
-    btn.textContent =
-      tryb === 'godzina'
-        ? wartosc
-        : dwa(wartosc);
-
-    btn.setAttribute(
-      'aria-label',
-      wartosc + (
-        tryb === 'godzina' ? ' godzina' : ' minut'
-      )
-    );
-
-    btn.addEventListener('click', e => {
-
-      e.stopPropagation();
-
-      if (tryb === 'godzina') {
-
-        wybranaGodzina = wartosc;
-        tryb = 'minuta';
-
-      } else {
-
-        wybranaMinuta = wartosc;
-
-      }
-
-      rysujTarcze();
-
-    });
-
-    pole('tarcza').appendChild(btn);
-  }
-
-  // Wybór dowolnej minuty przez dotknięcie tarczy.
-
-  pole('tarcza').addEventListener('click', e => {
-
-    if (tryb !== 'minuta') return;
-
-    const rect =
-      pole('tarcza').getBoundingClientRect();
-
-    const x = e.clientX
-      - rect.left
-      - rect.width / 2;
-
-    const y = e.clientY
-      - rect.top
-      - rect.height / 2;
-
-    // Pomijamy przypadkowe dotknięcie środka.
-
-    if (Math.hypot(x, y) < rect.width * .15) {
-      return;
-    }
-
-    const kat =
-      (Math.atan2(x, -y) * 180 / Math.PI + 360)
-      % 360;
-
-    wybranaMinuta = Math.round(kat / 6) % 60;
-
-    rysujTarcze();
-  });
-
-  pole('picker-godzina').onclick = () => {
-    tryb = 'godzina';
-    rysujTarcze();
-  };
-
-  pole('picker-minuta').onclick = () => {
     tryb = 'minuta';
-    rysujTarcze();
-  };
 
-  pole('minus').onclick = () => {
+    rysuj();
 
-    wybranaMinuta =
-      (wybranaMinuta + 59) % 60;
+  }
+});
 
-    rysujTarcze();
-  };
+// Przyciski sterujące selektorem.
 
-  pole('plus').onclick = () => {
+$('picker-godzina').onclick = () => {
 
-    wybranaMinuta =
-      (wybranaMinuta + 1) % 60;
+  tryb = 'godzina';
 
-    rysujTarcze();
-  };
+  rysuj();
 
-  pole('anuluj').onclick = () => {
+};
 
-    pole('picker').close();
+$('picker-minuta').onclick = () => {
 
-  };
+  tryb = 'minuta';
 
-  pole('zatwierdz').onclick = () => {
+  rysuj();
 
-    ustawPole(
-      aktywnePole,
-      dwa(wybranaGodzina)
-      + ':'
-      + dwa(wybranaMinuta)
-    );
+};
 
-    pole('picker').close();
+$('minus').onclick = () => {
 
-    oblicz();
-  };
+  m = (m + 59) % 60;
 
-  pole('wyczysc').onclick = () => {
+  rysuj();
 
-    ustawPole('nastepna', '');
-    oblicz();
+};
 
-  };
+$('plus').onclick = () => {
 
-  pola.forEach(id => {
+  m = (m + 1) % 60;
 
-    pole(id).addEventListener('click', () => {
-      otworzPicker(id);
-    });
+  rysuj();
 
-  });
+};
 
-  // Obliczenia czasu pracy i odpoczynku.
+$('anuluj').onclick = () => {
 
-  function minuty(godzina) {
+  $('picker').close();
 
-    if (!/^\d{2}:\d{2}$/.test(godzina)) {
-      return NaN;
-    }
+};
 
-    const [h, m] = godzina.split(':').map(Number);
+$('zatwierdz').onclick = () => {
 
-    return h < 24 && m < 60
-      ? h * 60 + m
-      : NaN;
+  if (klawiatura && !sprawdzWpis()) {
+    return;
   }
 
-  function czas(m) {
+  ustawPole(
+    aktywnePole,
+    dwa(h) + ':' + dwa(m)
+  );
 
-    const h = Math.floor(m / 60);
-    const min = m % 60;
+  $('picker').close();
 
-    return (h ? h + ' godz.' : '')
-      + (h && min ? ' ' : '')
-      + (min || !h ? min + ' min' : '');
-  }
-
-  function godzina(m) {
-
-    const dzien = Math.floor(m / DOBA);
-
-    const h = Math.floor((m % DOBA) / 60);
-    const min = m % 60;
-
-    return dwa(h) + ':' + dwa(min)
-      + (
-        dzien
-          ? ' (+' + dzien
-            + (dzien === 1 ? ' dzień)' : ' dni)')
-          : ''
-      );
-  }
-
-  function policz(od, koniec, nastepna) {
-
-    if (![od, koniec].every(Number.isFinite)) {
-      return null;
-    }
-
-    if (od === koniec) {
-      return { blad: true };
-    }
-
-    if (koniec < od) {
-      koniec += DOBA;
-    }
-
-    if (Number.isFinite(nastepna)) {
-
-      nastepna +=
-        Math.floor(koniec / DOBA) * DOBA;
-
-      if (nastepna < koniec) {
-        nastepna += DOBA;
-      }
-
-    } else {
-
-      nastepna = null;
-
-    }
-
-    const sluzba = koniec - od;
-
-    const minimalny =
-      sluzba >= PROG ? sluzba : null;
-
-    const najwczesniej =
-      minimalny === null
-        ? null
-        : koniec + minimalny;
-
-    return {
-
-      sluzba,
-      minimalny,
-      najwczesniej,
-      nastepna,
-
-      przekroczenie:
-        Math.max(0, sluzba - PROG),
-
-      odpoczynek:
-        nastepna === null
-          ? null
-          : nastepna - koniec
-
-    };
-  }
-
-  function oblicz() {
-
-    const wynik = pole('wynik');
-
-    const r = policz(
-      minuty(pole('od').dataset.value),
-      minuty(pole('do').dataset.value),
-      minuty(pole('nastepna').dataset.value)
-    );
-
-    if (!r) {
-      wynik.textContent =
-        'Wybierz prawidłowe godziny służby.';
-      return;
-    }
-
-    if (r.blad) {
-
-      wynik.innerHTML = `
-        <div class="alarm">
-          Godziny Od i Do są identyczne.
-          Nie można określić długości służby.
-        </div>`;
-
-      return;
-    }
-
-    const klasaPrzekroczenia =
-      r.przekroczenie > 0
-        ? 'czerwony'
-        : 'bez-przekroczenia';
-
-    let html = `
-
-      <div class="wiersz">
-        <span>Całkowita długość służby:</span>
-        <b>${czas(r.sluzba)}</b>
-      </div>
-
-      <div class="wiersz">
-        <span>Przekroczony czas pracy:</span>
-        <b class="${klasaPrzekroczenia}">
-          ${czas(r.przekroczenie)}
-        </b>
-      </div>
-
-      <div class="wiersz">
-        <span>Minimalny odpoczynek:</span>
-        <b class="${r.minimalny === null ? 'brak' : ''}">
-          ${r.minimalny === null
-            ? '—'
-            : czas(r.minimalny)}
-        </b>
-      </div>
-
-      <div class="wiersz">
-        <span>Najwcześniejsza kolejna służba:</span>
-        <b class="${r.najwczesniej === null ? 'brak' : ''}">
-          ${r.najwczesniej === null
-            ? '—'
-            : godzina(r.najwczesniej)}
-        </b>
-      </div>
-
-    `;
-
-    if (
-      r.nastepna !== null
-      && (
-        (
-          r.najwczesniej !== null
-          && r.nastepna < r.najwczesniej
-        )
-        || r.odpoczynek === 0
-      )
-    ) {
-
-      html += `
-        <div class="alarm">
-          <b>Krótki odpoczynek.</b>
-          Brak możliwości rozpoczęcia następnej
-          służby o zaplanowanej godzinie.
-        </div>
-      `;
-
-    }
-
-    wynik.innerHTML = html;
-  }
-
-  ustawGodziny();
   oblicz();
 
-</script>
+};
 
+$('wyczysc').onclick = () => {
+
+  ustawPole('nastepna', '');
+
+  oblicz();
+
+};
+
+for (const id of ['od', 'do', 'nastepna']) {
+
+  $(id).onclick = () => otworzPicker(id);
+
+}
+
+// LOGIKA KALKULATORA
+
+function minuty(v) {
+
+  if (!/^\d{2}:\d{2}$/.test(v)) {
+    return NaN;
+  }
+
+  const [a, b] = v.split(':').map(Number);
+
+  return a < 24 && b < 60
+    ? a * 60 + b
+    : NaN;
+}
+
+function czas(n) {
+
+  const a = Math.floor(n / 60);
+  const b = n % 60;
+
+  return (a ? a + ' godz.' : '')
+    + (a && b ? ' ' : '')
+    + (b || !a ? b + ' min' : '');
+}
+
+function godzina(n) {
+
+  const d = Math.floor(n / DOBA);
+
+  return format(n)
+    + (
+      d
+        ? ' (+' + d + (d === 1 ? ' dzień)' : ' dni)')
+        : ''
+    );
+}
+
+function policz(od, koniec, nastepna) {
+
+  if (![od, koniec].every(Number.isFinite)) {
+    return null;
+  }
+
+  if (od === koniec) {
+    return { blad: true };
+  }
+
+  // Służba przechodząca przez północ.
+
+  if (koniec < od) {
+    koniec += DOBA;
+  }
+
+  if (Number.isFinite(nastepna)) {
+
+    nastepna +=
+      Math.floor(koniec / DOBA) * DOBA;
+
+    if (nastepna < koniec) {
+      nastepna += DOBA;
+    }
+
+  } else {
+
+    nastepna = null;
+
+  }
+
+  const sluzba = koniec - od;
+
+  const minimalny =
+    sluzba >= PROG ? sluzba : null;
+
+  return {
+
+    sluzba,
+
+    minimalny,
+
+    nastepna,
+
+    najwczesniej:
+      minimalny === null
+        ? null
+        : koniec + minimalny,
+
+    przekroczenie:
+      Math.max(0, sluzba - PROG),
+
+    odpoczynek:
+      nastepna === null
+        ? null
+        : nastepna - koniec
+
+  };
+}
+
+function oblicz() {
+
+  const r = policz(
+    ...['od', 'do', 'nastepna']
+      .map(id => minuty($(id).dataset.value))
+  );
+
+  const wynik = $('wynik');
+
+  if (!r) {
+
+    wynik.textContent =
+      'Wybierz prawidłowe godziny służby.';
+
+    return;
+  }
+
+  if (r.blad) {
+
+    wynik.innerHTML = `
+      <div class="alarm">
+        Godziny Od i Do są identyczne.
+        Nie można określić długości służby.
+      </div>
+    `;
+
+    return;
+  }
+
+  const w = (etykieta, v, klasa = '') => `
+    <div class="wiersz">
+      <span>${etykieta}:</span>
+      <b class="${klasa}">${v}</b>
+    </div>
+  `;
+
+  wynik.innerHTML =
+
+    w(
+      'Całkowita długość służby',
+      czas(r.sluzba)
+    )
+
+    + w(
+      'Przekroczony czas pracy',
+      czas(r.przekroczenie),
+      r.przekroczenie ? 'czerwony' : 'zielony'
+    )
+
+    + w(
+      'Minimalny odpoczynek',
+      r.minimalny === null ? '—' : czas(r.minimalny),
+      r.minimalny === null ? 'brak' : ''
+    )
+
+    + w(
+      'Najwcześniejsza kolejna służba',
+      r.najwczesniej === null
+        ? '—'
+        : godzina(r.najwczesniej),
+      r.najwczesniej === null ? 'brak' : ''
+    );
+
+  if (
+    r.nastepna !== null
+    && (
+      (
+        r.najwczesniej !== null
+        && r.nastepna < r.najwczesniej
+      )
+      || r.odpoczynek === 0
+    )
+  ) {
+
+    wynik.innerHTML += `
+      <div class="alarm">
+        <b>Krótki odpoczynek.</b>
+        Brak możliwości rozpoczęcia następnej
+        służby o zaplanowanej godzinie.
+      </div>
+    `;
+
+  }
+}
+
+ustawGodziny();
+oblicz();
+
+</script>
 </body>
 </html>
