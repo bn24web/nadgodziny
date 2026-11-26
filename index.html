@@ -41,29 +41,32 @@
   label {
     display: block;
     font-weight: 600;
-    min-width: 0;
   }
 
-  input {
+  .pole-czasu {
     display: block;
     width: 100%;
-    min-width: 0;
     margin-top: 6px;
-    padding: 12px 10px;
+    padding: 12px;
     border: 1px solid #aab6c5;
     border-radius: 8px;
     background: #fff;
-    color: inherit;
+    color: #172334;
     font: inherit;
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 600;
     text-align: center;
     font-variant-numeric: tabular-nums;
+    cursor: pointer;
   }
 
-  input:focus-visible {
-    outline: 2px solid #2059a3;
-    outline-offset: 2px;
+  .pole-czasu:focus-visible {
+    outline: 2px solid #465b96;
+    outline-offset: 3px;
+  }
+
+  .pole-czasu.puste {
+    color: #aab2bc;
   }
 
   .nastepna {
@@ -76,32 +79,14 @@
     font-weight: 400;
   }
 
-  .tryby {
-    display: flex;
-    gap: 6px;
-    padding: 4px;
-    margin-bottom: 18px;
-    background: #eef2f6;
-    border-radius: 9px;
-  }
-
-  .tryby button {
-    flex: 1;
-    padding: 9px 6px;
+  .wyczysc {
+    display: block;
+    margin: 6px 0 0 auto;
     border: 0;
-    border-radius: 6px;
     background: transparent;
-    color: #687687;
-    font: inherit;
-    font-size: 13px;
-    font-weight: 600;
+    color: #526071;
+    font-size: 12px;
     cursor: pointer;
-  }
-
-  .tryby button.aktywny {
-    background: #fff;
-    color: #2059a3;
-    box-shadow: 0 1px 4px #00000015;
   }
 
   #wynik {
@@ -118,10 +103,6 @@
     padding: 10px 0;
     border-bottom: 1px solid #edf0f3;
     font-size: 14px;
-  }
-
-  .wiersz:last-of-type {
-    border-bottom: 0;
   }
 
   .wiersz b {
@@ -152,13 +133,185 @@
     font-size: 14px;
   }
 
+  /* Graficzny Time Picker */
+
+  dialog {
+    width: min(340px, calc(100vw - 24px));
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
+    padding: 20px;
+    border: 0;
+    border-radius: 25px;
+    background: #f0eff7;
+    color: #202332;
+    box-shadow: 0 12px 50px #0004;
+    overflow: auto;
+  }
+
+  dialog::backdrop {
+    background: rgba(0, 0, 0, .5);
+  }
+
+  .picker-tytul {
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #515665;
+  }
+
+  .picker-czas {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 20px;
+    font-size: 38px;
+  }
+
+  .picker-czas button {
+    width: 100px;
+    padding: 10px;
+    border: 0;
+    border-radius: 8px;
+    background: #dedfe9;
+    color: #202332;
+    font: inherit;
+    font-size: 44px;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+  }
+
+  .picker-czas button.aktywny {
+    background: #cdd5f5;
+    color: #182341;
+  }
+
+  .tarcza {
+    position: relative;
+    width: 100%;
+    max-width: 280px;
+    aspect-ratio: 1;
+    margin: auto;
+    border-radius: 50%;
+    background: #dbdce8;
+    touch-action: manipulation;
+    user-select: none;
+    cursor: pointer;
+  }
+
+  .numer {
+    position: absolute;
+    z-index: 2;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: transparent;
+    color: #202332;
+    font: inherit;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  .numer.wewnetrzny {
+    font-size: 12px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .numer.wybrany {
+    color: white;
+    font-weight: 600;
+    background: #465b96;
+  }
+
+  .wskazowka {
+    position: absolute;
+    z-index: 1;
+    bottom: 50%;
+    left: 50%;
+    width: 2px;
+    background: #465b96;
+    transform-origin: bottom center;
+    pointer-events: none;
+  }
+
+  .wskazowka::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: #465b96;
+  }
+
+  .srodek {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background: #465b96;
+    pointer-events: none;
+  }
+
+  .korekta-minut {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 14px;
+  }
+
+  .korekta-minut[hidden] {
+    display: none;
+  }
+
+  .korekta-minut button {
+    border: 1px solid #c4c7d5;
+    border-radius: 20px;
+    padding: 8px 18px;
+    background: transparent;
+    color: #465b96;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .picker-przyciski {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+
+  .picker-przyciski button {
+    border: 0;
+    border-radius: 20px;
+    padding: 10px 20px;
+    background: transparent;
+    color: #465b96;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .picker-przyciski .ok {
+    background: #465b96;
+    color: #fff;
+  }
+
   @media (max-width: 360px) {
     main {
       padding: 17px;
     }
 
-    input {
-      font-size: 22px;
+    .pole-czasu {
+      font-size: 24px;
     }
   }
 </style>
@@ -170,42 +323,107 @@
 
   <h1>Kalkulator nadgodzin</h1>
 
-  <div class="tryby">
-    <button type="button"
-            id="tryb-zegar"
-            class="aktywny"
-            aria-pressed="true">
-      Zegar
-    </button>
-
-    <button type="button"
-            id="tryb-klawiatura"
-            aria-pressed="false">
-      Klawiatura
-    </button>
-  </div>
-
   <div class="godziny">
-    <label>
-      Od
-      <input id="od" type="time" step="60" required>
-    </label>
 
-    <label>
-      Do
-      <input id="do" type="time" step="60" required>
-    </label>
+    <div>
+      <label for="od">Od</label>
+      <button id="od"
+              type="button"
+              class="pole-czasu"
+              data-value=""
+              aria-haspopup="dialog">
+      </button>
+    </div>
+
+    <div>
+      <label for="do">Do</label>
+      <button id="do"
+              type="button"
+              class="pole-czasu"
+              data-value=""
+              aria-haspopup="dialog">
+      </button>
+    </div>
+
   </div>
 
-  <label class="nastepna">
-    Start następnej służby
-    <span class="opcjonalne">(opcjonalnie)</span>
-    <input id="nastepna" type="time" step="60">
-  </label>
+  <div class="nastepna">
+
+    <label for="nastepna">
+      Start następnej służby
+      <span class="opcjonalne">
+        (opcjonalnie)
+      </span>
+    </label>
+
+    <button id="nastepna"
+            type="button"
+            class="pole-czasu puste"
+            data-value=""
+            aria-haspopup="dialog">
+      --:--
+    </button>
+
+    <button type="button"
+            id="wyczysc"
+            class="wyczysc"
+            hidden>
+      Wyczyść godzinę
+    </button>
+
+  </div>
 
   <footer id="wynik" aria-live="polite"></footer>
 
 </main>
+
+<!-- Graficzny Time Picker -->
+
+<dialog id="picker" aria-labelledby="picker-tytul">
+
+  <div class="picker-tytul" id="picker-tytul">
+    Wybierz godzinę
+  </div>
+
+  <div class="picker-czas">
+
+    <button type="button"
+            id="picker-godzina"
+            aria-label="Wybierz godziny">
+      00
+    </button>
+
+    <span>:</span>
+
+    <button type="button"
+            id="picker-minuta"
+            aria-label="Wybierz minuty">
+      00
+    </button>
+
+  </div>
+
+  <div id="tarcza" class="tarcza"></div>
+
+  <div id="korekta" class="korekta-minut" hidden>
+    <button type="button" id="minus">
+      −1 min
+    </button>
+    <button type="button" id="plus">
+      +1 min
+    </button>
+  </div>
+
+  <div class="picker-przyciski">
+    <button type="button" id="anuluj">
+      Anuluj
+    </button>
+    <button type="button" id="zatwierdz" class="ok">
+      OK
+    </button>
+  </div>
+
+</dialog>
 
 <script>
 
@@ -213,118 +431,336 @@
   const PROG = 720;
 
   const pole = id => document.getElementById(id);
+
   const pola = ['od', 'do', 'nastepna'];
 
-  function formatujGodzine(data) {
-    return String(data.getHours()).padStart(2, '0')
-      + ':'
-      + String(data.getMinutes()).padStart(2, '0');
+  const dwa = n => String(n).padStart(2, '0');
+
+  let aktywnePole = null;
+  let wybranaGodzina = 0;
+  let wybranaMinuta = 0;
+  let tryb = 'godzina';
+
+  function ustawPole(id, wartosc) {
+
+    const el = pole(id);
+
+    el.dataset.value = wartosc;
+    el.textContent = wartosc || '--:--';
+
+    el.classList.toggle('puste', !wartosc);
+
+    pole('wyczysc').hidden =
+      !pole('nastepna').dataset.value;
   }
 
-  // Ustawienie aktualnej godziny i początku 10 godzin wcześniej.
-
   function ustawGodziny() {
+
     const teraz = new Date();
 
     const minutyTeraz =
       teraz.getHours() * 60 + teraz.getMinutes();
 
-    const minutyPoczatku =
+    const poczatek =
       (minutyTeraz - 600 + DOBA) % DOBA;
 
-    pole('do').value = formatujGodzine(teraz);
+    ustawPole(
+      'do',
+      dwa(teraz.getHours()) + ':' +
+      dwa(teraz.getMinutes())
+    );
 
-    pole('od').value =
-      String(Math.floor(minutyPoczatku / 60))
-        .padStart(2, '0')
-      + ':'
-      + String(minutyPoczatku % 60)
-        .padStart(2, '0');
+    ustawPole(
+      'od',
+      dwa(Math.floor(poczatek / 60)) + ':' +
+      dwa(poczatek % 60)
+    );
 
-    pole('nastepna').value = '';
+    ustawPole('nastepna', '');
   }
 
-  // Przełączanie pomiędzy zegarem a klawiaturą.
+  // Otwarcie graficznego zegara.
 
-  function zmienTryb(tryb) {
-    const klawiatura = tryb === 'klawiatura';
+  function otworzPicker(id) {
 
-    if (!klawiatura) {
-      for (const id of pola) {
-        const wartosc = pole(id).value;
+    aktywnePole = id;
 
-        if (wartosc && !Number.isFinite(minuty(wartosc))) {
-          pole(id).focus();
-          return;
-        }
-      }
+    const wartosc = pole(id).dataset.value;
+
+    if (wartosc) {
+
+      [wybranaGodzina, wybranaMinuta] =
+        wartosc.split(':').map(Number);
+
+    } else {
+
+      const teraz = new Date();
+
+      wybranaGodzina = teraz.getHours();
+      wybranaMinuta = teraz.getMinutes();
+
     }
 
-    pola.forEach(id => {
-      const input = pole(id);
-      const wartosc = input.value;
+    tryb = 'godzina';
 
-      input.type = klawiatura ? 'text' : 'time';
+    rysujTarcze();
 
-      if (klawiatura) {
-        input.inputMode = 'numeric';
-        input.maxLength = 5;
-        input.placeholder = 'HH:MM';
-      } else {
-        input.removeAttribute('inputmode');
-        input.removeAttribute('maxlength');
-        input.removeAttribute('placeholder');
+    pole('picker').showModal();
+  }
+
+  // Budowanie tarczy zegara.
+
+  function rysujTarcze() {
+
+    const tarcza = pole('tarcza');
+
+    tarcza.replaceChildren();
+
+    const godziny = tryb === 'godzina';
+
+    pole('picker-tytul').textContent =
+      godziny ? 'Wybierz godzinę' : 'Wybierz minuty';
+
+    pole('picker-godzina').textContent =
+      dwa(wybranaGodzina);
+
+    pole('picker-minuta').textContent =
+      dwa(wybranaMinuta);
+
+    pole('picker-godzina').classList.toggle(
+      'aktywny', godziny
+    );
+
+    pole('picker-minuta').classList.toggle(
+      'aktywny', !godziny
+    );
+
+    pole('picker-godzina').setAttribute(
+      'aria-pressed', String(godziny)
+    );
+
+    pole('picker-minuta').setAttribute(
+      'aria-pressed', String(!godziny)
+    );
+
+    pole('korekta').hidden = godziny;
+
+    const kat = godziny
+      ? (wybranaGodzina % 12) * 30
+      : wybranaMinuta * 6;
+
+    const promien =
+      godziny && wybranaGodzina >= 12
+        ? 27
+        : 41;
+
+    const wskazowka = document.createElement('div');
+
+    wskazowka.className = 'wskazowka';
+    wskazowka.style.height = promien + '%';
+
+    wskazowka.style.transform =
+      'translateX(-50%) rotate(' + kat + 'deg)';
+
+    tarcza.appendChild(wskazowka);
+
+    const srodek = document.createElement('div');
+
+    srodek.className = 'srodek';
+
+    tarcza.appendChild(srodek);
+
+    if (godziny) {
+
+      for (let h = 0; h < 24; h++) {
+
+        dodajNumer(
+          h,
+          h % 12,
+          h >= 12 ? 27 : 41,
+          h === wybranaGodzina,
+          h >= 12
+        );
+
       }
 
-      input.value = wartosc;
+    } else {
+
+      for (let m = 0; m < 60; m += 5) {
+
+        dodajNumer(
+          m,
+          m / 5,
+          41,
+          m === wybranaMinuta,
+          false
+        );
+
+      }
+
+    }
+  }
+
+  function dodajNumer(
+    wartosc,
+    pozycja,
+    promien,
+    wybrany,
+    wewnetrzny
+  ) {
+
+    const rad = pozycja * Math.PI / 6;
+
+    const x = 50 + promien * Math.sin(rad);
+    const y = 50 - promien * Math.cos(rad);
+
+    const btn = document.createElement('button');
+
+    btn.type = 'button';
+    btn.className = 'numer';
+
+    if (wewnetrzny) {
+      btn.classList.add('wewnetrzny');
+    }
+
+    if (wybrany) {
+      btn.classList.add('wybrany');
+    }
+
+    btn.style.left = x + '%';
+    btn.style.top = y + '%';
+
+    btn.textContent =
+      tryb === 'godzina'
+        ? wartosc
+        : dwa(wartosc);
+
+    btn.setAttribute(
+      'aria-label',
+      wartosc + (
+        tryb === 'godzina' ? ' godzina' : ' minut'
+      )
+    );
+
+    btn.addEventListener('click', e => {
+
+      e.stopPropagation();
+
+      if (tryb === 'godzina') {
+
+        wybranaGodzina = wartosc;
+        tryb = 'minuta';
+
+      } else {
+
+        wybranaMinuta = wartosc;
+
+      }
+
+      rysujTarcze();
+
     });
 
-    pole('tryb-zegar').classList.toggle(
-      'aktywny', !klawiatura
-    );
-
-    pole('tryb-klawiatura').classList.toggle(
-      'aktywny', klawiatura
-    );
-
-    pole('tryb-zegar').setAttribute(
-      'aria-pressed', String(!klawiatura)
-    );
-
-    pole('tryb-klawiatura').setAttribute(
-      'aria-pressed', String(klawiatura)
-    );
-
-    oblicz();
+    pole('tarcza').appendChild(btn);
   }
 
-  pole('tryb-zegar').addEventListener('click', () => {
-    zmienTryb('zegar');
-  });
+  // Wybór dowolnej minuty przez dotknięcie tarczy.
 
-  pole('tryb-klawiatura').addEventListener('click', () => {
-    zmienTryb('klawiatura');
-  });
+  pole('tarcza').addEventListener('click', e => {
 
-  // Automatyczne formatowanie wpisywanych cyfr.
+    if (tryb !== 'minuta') return;
 
-  function formatujWpis(input) {
-    if (input.type !== 'text') return;
+    const rect =
+      pole('tarcza').getBoundingClientRect();
 
-    let cyfry = input.value
-      .replace(/\D/g, '')
-      .slice(0, 4);
+    const x = e.clientX
+      - rect.left
+      - rect.width / 2;
 
-    if (cyfry.length > 2) {
-      cyfry = cyfry.slice(0, 2)
-        + ':'
-        + cyfry.slice(2);
+    const y = e.clientY
+      - rect.top
+      - rect.height / 2;
+
+    // Pomijamy przypadkowe dotknięcie środka.
+
+    if (Math.hypot(x, y) < rect.width * .15) {
+      return;
     }
 
-    input.value = cyfry;
-  }
+    const kat =
+      (Math.atan2(x, -y) * 180 / Math.PI + 360)
+      % 360;
+
+    wybranaMinuta = Math.round(kat / 6) % 60;
+
+    rysujTarcze();
+  });
+
+  pole('picker-godzina').onclick = () => {
+    tryb = 'godzina';
+    rysujTarcze();
+  };
+
+  pole('picker-minuta').onclick = () => {
+    tryb = 'minuta';
+    rysujTarcze();
+  };
+
+  pole('minus').onclick = () => {
+
+    wybranaMinuta =
+      (wybranaMinuta + 59) % 60;
+
+    rysujTarcze();
+  };
+
+  pole('plus').onclick = () => {
+
+    wybranaMinuta =
+      (wybranaMinuta + 1) % 60;
+
+    rysujTarcze();
+  };
+
+  pole('anuluj').onclick = () => {
+
+    pole('picker').close();
+
+  };
+
+  pole('zatwierdz').onclick = () => {
+
+    ustawPole(
+      aktywnePole,
+      dwa(wybranaGodzina)
+      + ':'
+      + dwa(wybranaMinuta)
+    );
+
+    pole('picker').close();
+
+    oblicz();
+  };
+
+  pole('wyczysc').onclick = () => {
+
+    ustawPole('nastepna', '');
+    oblicz();
+
+  };
+
+  pola.forEach(id => {
+
+    pole(id).addEventListener('click', () => {
+      otworzPicker(id);
+    });
+
+  });
+
+  // Obliczenia czasu pracy i odpoczynku.
 
   function minuty(godzina) {
+
     if (!/^\d{2}:\d{2}$/.test(godzina)) {
       return NaN;
     }
@@ -337,6 +773,7 @@
   }
 
   function czas(m) {
+
     const h = Math.floor(m / 60);
     const min = m % 60;
 
@@ -346,13 +783,13 @@
   }
 
   function godzina(m) {
+
     const dzien = Math.floor(m / DOBA);
+
     const h = Math.floor((m % DOBA) / 60);
     const min = m % 60;
 
-    return String(h).padStart(2, '0')
-      + ':'
-      + String(min).padStart(2, '0')
+    return dwa(h) + ':' + dwa(min)
       + (
         dzien
           ? ' (+' + dzien
@@ -371,22 +808,23 @@
       return { blad: true };
     }
 
-    // Obsługa służby przechodzącej przez północ.
-
     if (koniec < od) {
       koniec += DOBA;
     }
 
     if (Number.isFinite(nastepna)) {
 
-      nastepna += Math.floor(koniec / DOBA) * DOBA;
+      nastepna +=
+        Math.floor(koniec / DOBA) * DOBA;
 
       if (nastepna < koniec) {
         nastepna += DOBA;
       }
 
     } else {
+
       nastepna = null;
+
     }
 
     const sluzba = koniec - od;
@@ -400,12 +838,11 @@
         : koniec + minimalny;
 
     return {
-      od,
-      koniec,
-      nastepna,
+
       sluzba,
       minimalny,
       najwczesniej,
+      nastepna,
 
       przekroczenie:
         Math.max(0, sluzba - PROG),
@@ -414,6 +851,7 @@
         nastepna === null
           ? null
           : nastepna - koniec
+
     };
   }
 
@@ -422,23 +860,25 @@
     const wynik = pole('wynik');
 
     const r = policz(
-      minuty(pole('od').value),
-      minuty(pole('do').value),
-      minuty(pole('nastepna').value)
+      minuty(pole('od').dataset.value),
+      minuty(pole('do').dataset.value),
+      minuty(pole('nastepna').dataset.value)
     );
 
     if (!r) {
       wynik.textContent =
-        'Wprowadź prawidłowe godziny Od i Do.';
+        'Wybierz prawidłowe godziny służby.';
       return;
     }
 
     if (r.blad) {
+
       wynik.innerHTML = `
         <div class="alarm">
           Godziny Od i Do są identyczne.
           Nie można określić długości służby.
         </div>`;
+
       return;
     }
 
@@ -482,16 +922,6 @@
     `;
 
     if (
-      pole('nastepna').value !== ''
-      && !Number.isFinite(minuty(pole('nastepna').value))
-    ) {
-      html += `
-        <div class="alarm">
-          Wprowadź prawidłową godzinę następnej służby.
-        </div>`;
-    }
-
-    if (
       r.nastepna !== null
       && (
         (
@@ -501,30 +931,19 @@
         || r.odpoczynek === 0
       )
     ) {
+
       html += `
         <div class="alarm">
           <b>Krótki odpoczynek.</b>
-          Brak możliwości rozpoczęcia następnej służby
-          o zaplanowanej godzinie.
+          Brak możliwości rozpoczęcia następnej
+          służby o zaplanowanej godzinie.
         </div>
       `;
+
     }
 
     wynik.innerHTML = html;
   }
-
-  pola.forEach(id => {
-
-    const input = pole(id);
-
-    input.addEventListener('input', () => {
-      formatujWpis(input);
-      oblicz();
-    });
-
-    input.addEventListener('change', oblicz);
-
-  });
 
   ustawGodziny();
   oblicz();
